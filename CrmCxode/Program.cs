@@ -6,7 +6,11 @@ using CrmCxode.Contracts;
 using CrmCxode.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Extensions.Logging;
 
 //// Register services
 //var serviceProvider = new ServiceCollection()
@@ -22,6 +26,11 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
+// connection to NLog via appsettings
+builder.Logging.ClearProviders();
+builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
+builder.Logging.AddNLog(builder.Configuration);
+
 var settings = builder.Configuration.GetSection("MainSettings").Get<MainSettings>();
 builder.Services.AddSingleton(settings);
 
@@ -36,7 +45,22 @@ var host = builder.Build();
 
 using var scope = host.Services.CreateScope();
 
-Console.WriteLine("Hello, World!");
+var logger = host.Services.GetRequiredService<ILogger<Program>>();
+
+
+// catching global unhandled exceptions
+AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+{
+    logger.LogError(e.ExceptionObject as Exception, "Unhandled exception");
+    LogManager.Shutdown();
+};
+
+// Catches asynchronous exceptions that were not awaited
+TaskScheduler.UnobservedTaskException += (s, e) =>
+{
+    logger.LogError(e.Exception, "Unobserved task exception");
+    e.SetObserved();
+};
 
 var ticketService = scope.ServiceProvider.GetRequiredService<ITicket>();
 
