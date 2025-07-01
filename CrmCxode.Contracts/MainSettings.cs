@@ -11,6 +11,6 @@ namespace CrmCxode.Contracts
     {
         public string CrmApi { get; set; }
         public string CxoneApi { get; set; }
-        public string LogFilePath { get; set; }
+        public int MaxConcurrentRequests { get; set; }
     }
 }

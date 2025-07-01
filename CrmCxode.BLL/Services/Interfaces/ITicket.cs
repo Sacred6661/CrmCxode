@@ -10,6 +10,7 @@ namespace CrmCxode.BLL.Services
     public interface ITicket
     {
         public Task<List<CrmTicket>> GetCrmTicketsAsync();
-        public Task SendTickets(List<CrmTicket> tickets);
+        public Task SendTicketsAsync(List<CrmTicket> tickets);
+        public Task SendTicketsParallelAsync(List<CrmTicket> tickets);
     }
 }

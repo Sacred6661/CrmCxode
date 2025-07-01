@@ -41,6 +41,10 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
+// Note that MaxConcurrentRequests should be changed base on max connection in one time
+int maxConcurrent = builder.Configuration.GetValue<int>("MainSettings:MaxConcurrentRequests");
+builder.Services.AddSingleton(new SemaphoreSlim(maxConcurrent));
+
 var host = builder.Build();
 
 using var scope = host.Services.CreateScope();
@@ -66,7 +70,9 @@ var ticketService = scope.ServiceProvider.GetRequiredService<ITicket>();
 
 var tickets = await ticketService.GetCrmTicketsAsync();
 
+// This allows to use code without parallels connection
+//await ticketService.SendTicketsAsync(tickets);
 
-await ticketService.SendTickets(tickets);
 
-//await crmService.GetTicketsAsync();
+// parallel using.
+await ticketService.SendTicketsParallelAsync(tickets);
