@@ -95,9 +95,9 @@ namespace CrmCxode.BLL.Services
                 UpdateMaxActive(current);
 
                 _logger.LogInformation($"Task {ticket.Id}, Subject: {ticket.Subject} running");
-
+                await _cxoneService.SendTicketAsync(ticket);
                 // this is added just to check that semaphores is working. pause during execution
-                await Task.Delay(1500);
+                //await Task.Delay(1500);
 
                 _logger.LogInformation($"Ticket id {ticket.Id} is sent.");
             }
