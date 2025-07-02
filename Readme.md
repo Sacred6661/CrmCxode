@@ -1,7 +1,5 @@
 
 
-﻿# Test task CRM to CXone
-
 ## You need to work with:
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download) or later installed
